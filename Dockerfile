@@ -5,8 +5,9 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-# Instalar dependencias de desarrollo
-RUN npm install
+# Instalar dependencias de desarrollo y el CLI de NestJS
+RUN npm install -g @nestjs/cli && \
+    npm install
 
 COPY . .
 
@@ -19,14 +20,12 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-# Instalar solo dependencias de producción y el CLI de NestJS globalmente
-RUN npm install -g @nestjs/cli && \
-    npm install --only=production
-
-COPY . .
+# Instalar solo dependencias de producción
+RUN npm ci --only=production
 
 # Copiar los archivos compilados desde la etapa de desarrollo
 COPY --from=development /usr/src/app/dist ./dist
+COPY --from=development /usr/src/app/node_modules ./node_modules
 
 EXPOSE 3000
 
