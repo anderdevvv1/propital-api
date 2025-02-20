@@ -5,9 +5,8 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-# instalar todas las dependencias (incluyendo devDependencies)
-RUN npm install @nestjs/terminus @nestjs/axios && \
-    npm install
+# Instalar dependencias de desarrollo
+RUN npm install
 
 COPY . .
 
@@ -20,13 +19,14 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-# instalar solo dependencias de producción
-RUN npm install --only=production @nestjs/terminus @nestjs/axios && \
+# Instalar solo dependencias de producción y el CLI de NestJS globalmente
+RUN npm install -g @nestjs/cli && \
     npm install --only=production
 
 COPY . .
 
-RUN npm run build
+# Copiar los archivos compilados desde la etapa de desarrollo
+COPY --from=development /usr/src/app/dist ./dist
 
 EXPOSE 3000
 
